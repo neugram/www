@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Neugram. Go scripting.</title>
+<meta name=viewport content="width=device-width, initial-scale=1"/>
+<style>
+h1, h2, h3 {
+	font-family: sans-serif;
+}
+
+a {
+	font-weight: bold;
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+
+@media screen and (min-width: 15cm) {
+	body {
+		margin-right: auto;
+		padding-left: 8mm;
+		padding-right: 8mm;
+	}
+	section {
+		max-width: 40em;
+	}
+	hr {
+		max-width: 40em;
+		margin-left: 0;
+	}
+	#demo-code {
+		float: right;
+	}
+}
+@media not screen and (min-width: 15cm) {
+	#demo-code {
+		float: left;
+	}
+}
+
+#intro {
+	font-size: 1.17em;
+}
+
+#demo-code {
+	border: 1px solid lightgray;
+	background: #f9f9f9;
+	padding: 8px;
+	margin-bottom: 10px;
+}
+
+.code {
+	font-family: monospace;
+	white-space: pre;
+}
+.code .comment { color: #008800; }
+.code .string  { color: #2552b1; }
+.code .keyword { color: #aa0f90; }
+</style>
+</head>
+<body>
+
+<section>
+<h1>Neugram, Go scripting</h1>
+<div id="intro">
+Neugram is a programming language designed to let you work quickly.
+<br><br>
+It integrates seamlessly with <a href="https://golang.org">Go</a>.
+</div>
+
+<div>
+
+<div id="demo-code" class="code">#!/usr/bin/ng
+
+<span class="comment">// Start a web server to serve files.</span>
+<span class="keyword">import</span> <span class="string">"net/http"</span>
+pwd <span class="keyword">:=</span> <span class="keyword">$$</span> echo $PWD <span class="keyword">$$</span>
+h <span class="keyword">:=</span> http.FileServer(http.Dir(pwd))
+http.ListenAndServe(<span class="string">":8080"</span>, h)
+</div>
+
+<h3>Featuring</h3>
+
+<ul>
+	<li><code>#!</code> script support</li>
+	<li>REPL</li>
+	<li>top-level statements</li>
+	<li>error elision</li>
+	<li><a href="https://github.com/neugram/ng/blob/master/docs/shell.md">integrated shell</a></li>
+</ul>
+
+</div>
+
+<h3>Download</h3>
+
+<p>Weekly binary releases will start when Go 1.10 is released in January 2018. (With it come several necessary plugin fixes and support on macOS.)
+
+<p>In the mean time, you can build neugram from HEAD with:
+<blockquote><code>go install neugram.io/ng</code></blockquote>
+
+<h3>Documentation</h3>
+
+<h3>Community</h3>
+
+<p>For discussion, there is a <a href="https://groups.google.com/forum/#!forum/neugram">neugram mailing list</a>.
+
+<p>Neugram is released under a MIT-style license.
+
+<p>All the source code to neugram lives in git and is hosted in a <a href="https://github.com/neugram">github repository</a>.
+
+</section>
+</body>
+</html>
