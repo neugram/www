@@ -10,7 +10,9 @@ import (
 	"flag"
 	"io/ioutil"
 	"log"
+	"mime"
 	"net/http"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -40,12 +42,19 @@ func staticHandler(path, gzb64src string) func(w http.ResponseWriter, req *http.
 		log.Fatalf("error gunzipping %s: %v", path, err)
 	}
 
-	contentType := http.DetectContentType(src)
+	ctype := mime.TypeByExtension(filepath.Ext(path))
+	if ctype == "" {
+		ctype = http.DetectContentType(src)
+	}
 	gzetag := makeEtag(gzsrc)
 	etag := makeEtag(src)
 
 	return func(w http.ResponseWriter, req *http.Request) {
-		w.Header().Set("Content-Type", contentType)
+		if req.URL.Path != path {
+			http.NotFound(w, req)
+			return
+		}
+		w.Header().Set("Content-Type", ctype)
 
 		if strings.Contains(req.Header.Get("Accept-Encoding"), "gzip") {
 			w.Header().Set("Content-Encoding", "gzip")

@@ -1,0 +1,54 @@
+h1, h2, h3 {
+	font-family: sans-serif;
+}
+
+a {
+	font-weight: bold;
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+
+@media screen and (min-width: 15cm) {
+	body {
+		margin-right: auto;
+		padding-left: 8mm;
+		padding-right: 8mm;
+	}
+	section {
+		max-width: 40em;
+	}
+	hr {
+		max-width: 40em;
+		margin-left: 0;
+	}
+	#demo-code {
+		float: right;
+	}
+}
+@media not screen and (min-width: 15cm) {
+	#demo-code {
+		float: left;
+	}
+}
+
+#intro {
+	font-size: 1.17em;
+}
+
+#demo-code {
+	border: 1px solid lightgray;
+	background: #f9f9f9;
+	padding: 8px;
+	margin-bottom: 10px;
+}
+
+.code {
+	font-family: monospace;
+	white-space: pre;
+}
+.code .comment { color: #008800; }
+.code .string  { color: #2552b1; }
+.code .keyword { color: #aa0f90; }
+
