@@ -90,8 +90,8 @@ func writeFile(buf *bytes.Buffer, name string, path string) {
 	}
 
 	var src []byte
-	switch filepath.Ext(path) {
-	case ".html":
+	if filepath.Base(path) == "main.html" {
+		// TODO: apply to all .html files
 		// Treat this as a template.
 		t := template.Must(tmpl.New(name).Parse(string(orig)))
 		srcbuf := new(bytes.Buffer)
@@ -99,7 +99,7 @@ func writeFile(buf *bytes.Buffer, name string, path string) {
 			log.Fatal(err)
 		}
 		src = srcbuf.Bytes()
-	default:
+	} else {
 		src = orig
 	}
 	writeBytes(buf, name, src)
@@ -194,6 +194,7 @@ func main() {
 	fmt.Fprint(buf, "package main\n\n")
 
 	writeFile(buf, "/", "main.html")
+	writeFile(buf, "/ng/", "ng.html")
 	writeBlogFiles(buf)
 
 	out, err := format.Source(buf.Bytes())
