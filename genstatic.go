@@ -17,6 +17,8 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
+	"time"
 
 	blackfriday "gopkg.in/russross/blackfriday.v2"
 )
@@ -56,6 +58,7 @@ var bloglist = template.Must(tmpl.New("bloglist").Parse(`
 <meta charset="utf-8">
 <title>The Neugram Blog</title>
 <meta name=viewport content="width=device-width, initial-scale=1"/>
+<link href="https://neugram.io/atom.xml" rel="alternate" type="application/rss+xml" title="The Neugram Blog" />
 <style>
 {{template "style.css"}}
 
@@ -76,11 +79,40 @@ var bloglist = template.Must(tmpl.New("bloglist").Parse(`
 </html>
 `))
 
+var blogatom = template.Must(tmpl.New("bloglist").Parse(`
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+<channel>
+<title>The Neugram Blog</title>
+<link>https://neugram.io/atom.xml</link>
+<description>Recent content on The Neugram Blog</description>
+<generator>custom neugram</generator>
+<language>en-us</language>
+<lastBuildDate>{{.LatestDate}}</lastBuildDate>
+<atom:link href="https://neugram.io/atom.xml" rel="self" type="application/rss+xml"/>
+
+{{range .Entries}}
+<item>
+<title>{{.Title}}</title>
+<link>https://neugram.io{{.URL}}</link>
+<pubDate>{{.PubDate}}</pubDate>
+<guid>https://neugram.io{{.URL}}</guid>
+<description>
+{{.ContentsQuoted}}
+</description>
+</item>
+{{end}}
+
+</channel>
+</rss>
+`))
+
 type BlogEntry struct {
-	URL      string
-	Title    string
-	Contents template.HTML
-	Date     string
+	URL            string
+	Title          string
+	Contents       template.HTML
+	ContentsQuoted string
+	Date           string // for humans
+	PubDate        string // for machines: "Mon, 2 Jan 2006 00:00:00 +0000"
 }
 
 func writeFile(buf *bytes.Buffer, name string, path string) {
@@ -139,6 +171,7 @@ func writeBlogFiles(buf *bytes.Buffer) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	sort.Sort(sort.Reverse(sort.StringSlice(blogFiles)))
 	var entries []BlogEntry
 	for _, blogFile := range blogFiles {
 		if filepath.Ext(blogFile) != ".md" {
@@ -151,6 +184,10 @@ func writeBlogFiles(buf *bytes.Buffer) {
 		}
 		match := mdNameRE.FindStringSubmatch(filepath.Base(blogFile))
 		date, urlTitle := match[1], match[2]
+		dateVal, err := time.Parse("2006-01-02", date)
+		if err != nil {
+			log.Fatalf("%q date: %v", blogFile, err)
+		}
 
 		titleMatch := titleRE.FindSubmatch(src)
 		if titleMatch == nil {
@@ -162,10 +199,12 @@ func writeBlogFiles(buf *bytes.Buffer) {
 		out := blackfriday.Run(src)
 		srcbuf := new(bytes.Buffer)
 		entry := BlogEntry{
-			URL:      url,
-			Title:    title,
-			Date:     date,
-			Contents: template.HTML(out),
+			URL:            url,
+			Title:          title,
+			Date:           date,
+			PubDate:        dateVal.Format("Mon, 2 Jan 2006 00:00:00 +0000"),
+			Contents:       template.HTML(out),
+			ContentsQuoted: string(out),
 		}
 		if err = tmpl.Execute(srcbuf, entry); err != nil {
 			log.Fatal(err)
@@ -179,6 +218,20 @@ func writeBlogFiles(buf *bytes.Buffer) {
 		log.Fatal(err)
 	}
 	writeBytes(buf, "/blog/", srcbuf.Bytes())
+
+	type RSS struct {
+		LatestDate string
+		Entries    []BlogEntry
+	}
+	rss := RSS{
+		LatestDate: entries[0].PubDate,
+		Entries:    entries,
+	}
+	srcbuf = new(bytes.Buffer)
+	if err := blogatom.Execute(srcbuf, rss); err != nil {
+		log.Fatal(err)
+	}
+	writeBytes(buf, "/atom.xml", srcbuf.Bytes())
 }
 
 func main() {
