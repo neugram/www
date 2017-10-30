@@ -16,7 +16,7 @@ scripts as in big complex projects, Go is slower to work in than
 Python and Perl for a few reasons:
 
 - No read-eval-print-loop.
-- No [shebang](https://en.wikipedia.org/wiki/Shebang_(Unix)) support.
+- No [shebang](https://en.wikipedia.org/wiki/Shebang_%28Unix%29) support.
 - Lots of unhelpful error handling.
 (Go's explicit error handling is wonderful in large programs, but
 in small scripts where all you write is
