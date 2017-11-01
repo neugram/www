@@ -73,7 +73,7 @@ So for the language to be REPL-compatible it needs serious grammar
 surgery, which would make a REPL possible, but hurt the readability
 of big complex programs.
 
-Neugram has its own [its own statement-based method syntax](https://github.com/neugram/ng/blob/master/eval/testdata/method2.ng),
+Neugram has [its own statement-based method syntax](https://github.com/neugram/ng/blob/master/eval/testdata/method2.ng),
 which diverges in a small but significant way from Go. (Though it
 won't be properly functional until the
 [Go generating backend](https://github.com/neugram/ng/issues/5)
@@ -90,7 +90,7 @@ Unfortunately, there is one place where even a strong supporter of
 explicit error handling can admit the process is tedious: when
 writing "all or nothing" scripts.
 That is, programs that either follow the narrow success path
-completley, or if they step off the path even slightly exit
+completely, or if they step off the path even slightly, exit
 immediately in error.
 Small Python scripts follow this process by default, and bash script
 authors often do by placing `set -e` at the top of their scripts.
