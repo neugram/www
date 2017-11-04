@@ -25,28 +25,14 @@ import (
 
 var outfile = flag.String("o", "", "result will be written file")
 
-var tmpl = template.Must(template.New("blogentry").Parse(`<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>The Neugram Blog: {{.Title}}</title>
-<meta name=viewport content="width=device-width, initial-scale=1"/>
-<style>
-{{template "style.css"}}
-</style>
-</head>
-<body>
-{{.Contents}}
-
-<a href="/">Home</a>,
-<a href="/blog/">Blog Archive</a>
-
-{{template "footer"}}
-</body>
-</html>
-`))
-
-var footer = template.Must(tmpl.New("footer").Parse(`<script>
+var neusvg = loadTmpl("neu.svg")
+var bloglist = loadTmpl("blog.html")
+var blogatom = loadTmpl("atom.xml")
+var blogentry = loadTmpl("blogentry.html")
+var mainhtml = loadTmpl("main.html")
+var nghtml = loadTmpl("ng.html")
+var stylecss = loadTmpl("style.css")
+var footer = template.Must(template.New("footer").Parse(`<script>
 window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
 ga('create', 'UA-92251090-1', 'auto');
 ga('send', 'pageview');
@@ -54,60 +40,13 @@ ga('send', 'pageview');
 <script async src='https://www.google-analytics.com/analytics.js'></script>
 `))
 
-var bloglist = template.Must(tmpl.New("bloglist").Parse(`
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>The Neugram Blog</title>
-<meta name=viewport content="width=device-width, initial-scale=1"/>
-<link href="https://neugram.io/atom.xml" rel="alternate" type="application/rss+xml" title="The Neugram Blog" />
-<style>
-{{template "style.css"}}
-
-.entries div { display: flex; }
-.entrydate   { width: 6em; text-align; right; flex-shrink: 0; }
-</style>
-</head>
-<body>
-<h1>The Neugram Blog</h1>
-<div class="entries">
-{{range .}}
-<div><div class="entrydate">{{.Date}}</div><a href="{{.URL}}">{{.Title}}</a></div>
-{{end}}
-</div>
-
-{{template "footer"}}
-</body>
-</html>
-`))
-
-var blogatom = template.Must(tmpl.New("bloglist").Parse(`
-<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
-<channel>
-<title>The Neugram Blog</title>
-<link>https://neugram.io/atom.xml</link>
-<description>Recent content on The Neugram Blog</description>
-<generator>custom neugram</generator>
-<language>en-us</language>
-<lastBuildDate>{{.LatestDate}}</lastBuildDate>
-<atom:link href="https://neugram.io/atom.xml" rel="self" type="application/rss+xml"/>
-
-{{range .Entries}}
-<item>
-<title>{{.Title}}</title>
-<link>https://neugram.io{{.URL}}</link>
-<pubDate>{{.PubDate}}</pubDate>
-<guid>https://neugram.io{{.URL}}</guid>
-<description>
-{{.ContentsQuoted}}
-</description>
-</item>
-{{end}}
-
-</channel>
-</rss>
-`))
+func loadTmpl(filename string) (t *template.Template) {
+	b, err := ioutil.ReadFile(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return template.Must(footer.New(filename).Parse(string(b)))
+}
 
 type BlogEntry struct {
 	URL            string
@@ -116,28 +55,6 @@ type BlogEntry struct {
 	ContentsQuoted string
 	Date           string // for humans
 	PubDate        string // for machines: "Mon, 2 Jan 2006 00:00:00 +0000"
-}
-
-func writeFile(buf *bytes.Buffer, name string, path string) {
-	orig, err := ioutil.ReadFile(path)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	var src []byte
-	if filepath.Base(path) == "main.html" {
-		// TODO: apply to all .html files
-		// Treat this as a template.
-		t := template.Must(tmpl.New(name).Parse(string(orig)))
-		srcbuf := new(bytes.Buffer)
-		if err := t.Execute(srcbuf, nil); err != nil {
-			log.Fatal(err)
-		}
-		src = srcbuf.Bytes()
-	} else {
-		src = orig
-	}
-	writeBytes(buf, name, src)
 }
 
 func writeBytes(buf *bytes.Buffer, name string, src []byte) {
@@ -177,10 +94,6 @@ func writeBlogFiles(buf *bytes.Buffer) {
 	sort.Sort(sort.Reverse(sort.StringSlice(blogFiles)))
 	var entries []BlogEntry
 	for _, blogFile := range blogFiles {
-		if filepath.Ext(blogFile) != ".md" {
-			writeFile(buf, "/"+blogFile, blogFile)
-			continue
-		}
 		src, err := ioutil.ReadFile(blogFile)
 		if err != nil {
 			log.Fatal(err)
@@ -209,7 +122,7 @@ func writeBlogFiles(buf *bytes.Buffer) {
 			Contents:       template.HTML(out),
 			ContentsQuoted: string(out),
 		}
-		if err = tmpl.Execute(srcbuf, entry); err != nil {
+		if err = blogentry.Execute(srcbuf, entry); err != nil {
 			log.Fatal(err)
 		}
 		entries = append(entries, entry)
@@ -235,22 +148,35 @@ func writeBlogFiles(buf *bytes.Buffer) {
 		log.Fatal(err)
 	}
 	writeBytes(buf, "/atom.xml", srcbuf.Bytes())
+
+	if len(entries) > 5 {
+		entries = entries[:5]
+	}
+	srcbuf = new(bytes.Buffer)
+	if err := mainhtml.Execute(srcbuf, entries); err != nil {
+		log.Fatal(err)
+	}
+	writeBytes(buf, "/", srcbuf.Bytes())
 }
 
 func main() {
 	flag.Parse()
 
-	cssb, err := ioutil.ReadFile("style.css")
-	if err != nil {
-		log.Fatal(err)
-	}
-	template.Must(tmpl.New("style.css").Parse(string(cssb)))
-
 	buf := new(bytes.Buffer)
 	fmt.Fprint(buf, "package main\n\n")
 
-	writeFile(buf, "/", "main.html")
-	writeFile(buf, "/ng/", "ng.html")
+	srcbuf := new(bytes.Buffer)
+	if err := nghtml.Execute(srcbuf, nil); err != nil {
+		log.Fatal(err)
+	}
+	writeBytes(buf, "/ng/", srcbuf.Bytes())
+
+	b, err := ioutil.ReadFile("favicon.png")
+	if err != nil {
+		log.Fatal(err)
+	}
+	writeBytes(buf, "/favicon.png", b)
+
 	writeBlogFiles(buf)
 
 	out, err := format.Source(buf.Bytes())

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>The Neugram Blog</title>
+<link href="https://neugram.io/atom.xml" rel="alternate" type="application/rss+xml" title="The Neugram Blog" />
+<link rel="icon" type="image/png" href="/favicon.png">
+<meta name=viewport content="width=device-width, initial-scale=1"/>
+<style>
+{{template "style.css"}}
+</style>
+</head>
+<body>
+<h1>The Neugram Blog</h1>
+<div class="entries">
+{{range .}}
+<div><div class="entrydate">{{.Date}}</div><a href="{{.URL}}">{{.Title}}</a></div>
+{{end}}
+</div>
+
+{{template "footer"}}
+</body>
+</html>

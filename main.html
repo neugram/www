@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>Neugram, Go scripting.</title>
+<link rel="icon" type="image/png" href="/favicon.png">
 <meta name=viewport content="width=device-width, initial-scale=1"/>
 <style>
 {{template "style.css"}}
@@ -12,6 +13,7 @@
 
 <h1>Neugram, Go scripting</h1>
 <section>
+
 <div id="intro">
 Neugram is a programming language designed to let you work quickly.
 <br><br>
@@ -19,6 +21,20 @@ It integrates seamlessly with <a href="https://golang.org">Go</a>.
 </div>
 
 <div>
+
+<div id="neu">{{template "neu.svg"}}</div>
+
+<h3>Featuring</h3>
+<ul>
+	<li><code>#!</code> script support</li>
+	<li>REPL</li>
+	<li>top-level statements</li>
+	<li>error elision</li>
+	<li>integrated shell</li>
+</ul>
+
+An example:
+<p>
 
 <div id="demo-code" class="code">#!/usr/bin/ng
 
@@ -29,18 +45,6 @@ h <span class="keyword">:=</span> http.FileServer(http.Dir(pwd))
 http.ListenAndServe(<span class="string">":8080"</span>, h)
 </div>
 
-<h3>Featuring</h3>
-
-<ul>
-	<li><code>#!</code> script support</li>
-	<li>REPL</li>
-	<li>top-level statements</li>
-	<li>error elision</li>
-	<li>integrated shell</li>
-</ul>
-
-</div>
-
 <h3>Download</h3>
 
 <p>Weekly binary releases will start when Go 1.10 is released in January 2018. (With it come several necessary plugin fixes and support on macOS.)
@@ -48,15 +52,22 @@ http.ListenAndServe(<span class="string">":8080"</span>, h)
 <p>In the mean time, you can build neugram from HEAD with:
 <blockquote><code>go install neugram.io/ng</code></blockquote>
 
+<h3>Blog</h3>
+
+<div class="entries">
+{{range .}}
+<div><div class="entrydate">{{.Date}}</div><a href="{{.URL}}">{{.Title}}</a></div>
+{{end}}
+</div>
+
+<br><a href="/blog/">Blog Archive</a>
+
 <h3>Documentation</h3>
 
 <ul>
-	<li><a href="/blog/neugram-briefly">Neugram, briefly</a></li>
 	<li><a href="https://github.com/neugram/ng/blob/master/docs/shell.md">shell reference</a></li>
-	<li><a href="/blog">blog</a> (more posts on the way)</li>
+	<li>Much more needed!</li>
 </ul>
-
-<p>Not much yet. <code>:-/</code>
 
 <h3>Community</h3>
 
@@ -72,12 +83,7 @@ http.ListenAndServe(<span class="string">":8080"</span>, h)
 
 </section>
 
-<script>
-window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-ga('create', 'UA-92251090-1', 'auto');
-ga('send', 'pageview');
-</script>
-<script async src='https://www.google-analytics.com/analytics.js'></script>
+{{template "footer"}}
 
 </body>
 </html>

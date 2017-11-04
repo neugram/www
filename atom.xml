@@ -1,0 +1,24 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+<channel>
+<title>The Neugram Blog</title>
+<link>https://neugram.io/atom.xml</link>
+<description>Recent content on The Neugram Blog</description>
+<generator>custom neugram</generator>
+<language>en-us</language>
+<lastBuildDate>{{.LatestDate}}</lastBuildDate>
+<atom:link href="https://neugram.io/atom.xml" rel="self" type="application/rss+xml"/>
+
+{{range .Entries}}
+<item>
+<title>{{.Title}}</title>
+<link>https://neugram.io{{.URL}}</link>
+<pubDate>{{.PubDate}}</pubDate>
+<guid>https://neugram.io{{.URL}}</guid>
+<description>
+{{.ContentsQuoted}}
+</description>
+</item>
+{{end}}
+
+</channel>
+</rss>

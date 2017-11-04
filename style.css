@@ -23,14 +23,22 @@ a:hover {
 		max-width: 40em;
 		margin-left: 0;
 	}
-	#demo-code {
+	#neu {
 		float: right;
+		width: 260px;
+		height:490px;
 	}
 }
 @media not screen and (min-width: 15cm) {
-	#demo-code {
-		float: left;
+	#neu {
+		float: right;
+		width: 104px;
+		height:196px;
 	}
+}
+
+#demo-code {
+	float: left;
 }
 
 #intro {
@@ -52,3 +60,5 @@ a:hover {
 .code .string  { color: #2552b1; }
 .code .keyword { color: #aa0f90; }
 
+.entries div { display: flex; }
+.entrydate   { width: 6em; text-align; right; flex-shrink: 0; }
