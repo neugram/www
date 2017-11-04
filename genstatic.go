@@ -38,6 +38,9 @@ var tmpl = template.Must(template.New("blogentry").Parse(`<!DOCTYPE html>
 <body>
 {{.Contents}}
 
+<a href="/">Home</a>,
+<a href="/blog/">Blog Archive</a>
+
 {{template "footer"}}
 </body>
 </html>
