@@ -50,7 +50,7 @@ func staticHandler(path, gzb64src string) func(w http.ResponseWriter, req *http.
 	etag := makeEtag(src)
 
 	return func(w http.ResponseWriter, req *http.Request) {
-		if req.URL.Path != path {
+		if req.URL.Path != path && !strings.HasPrefix(req.URL.Path, "/ng/") {
 			http.NotFound(w, req)
 			return
 		}
