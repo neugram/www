@@ -102,7 +102,7 @@ This:
 
 ```python
 #!/usr/bin/python
-f = open("hello.txt","w" 
+f = open("hello.txt","w") 
 f.write("Hello, World!") 
 f.write("Next line.")
 f.close()
